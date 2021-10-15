@@ -14,35 +14,54 @@ def main() -> None:
 
 def read_args():
 
-    dir = os.path.dirname(__file__)
-
     parser = argparse.ArgumentParser()
     parser.add_argument( "node_col_name_1", type=str, help="column name of input file to be represented as node (first of two inputs)")
     parser.add_argument( "edge_col_name", type=str, help="column name of input file to be represented as edges (first of one input)")
     parser.add_argument( "node_col_name_2", type=str, help="column name of input file to be represented as node (second of two inputs)")
-    parser.add_argument("-i", "--input_filename", type=str, default=os.path.join(dir, 'data', 'antisemitism_discrimination_triplets.csv'), help=".csv input filepath to translate into VOSviewer triplets")
+    parser.add_argument("-i", "--input_filename", type=str, help=".csv input filepath to translate into VOSviewer triplets")
     parser.add_argument("-c", "--context_col_name", type=str, default="texts", help="column file to be represented as context")
     parser.add_argument("-v", "--verbosity", action="count", default=0)
     parser.add_argument("-o", "--output", type=str, default=os.path.join(dir, 'output', 'output.json'), help="argument for specifying output filepath location")
-    parser.add_argument("-f", "--include_formatted_html", action="count", default=0, help="argument to determine if Metadata should be included + description formatted (Bespoke for our discrim triplet data)")
+    parser.add_argument("-f", "--include_formatted_html", action="count", default=0, help="argument to determine if metadata should be included & description formatted specific to Discrimination Triplets")
 
     args = parser.parse_args()
 
-    if os.path.exists(args.input_filename) == False: # specified filepath does not exist
-        if os.path.exists(os.path.join(dir, 'data', 'antisemitism_discrimination_triplets.csv')) == False: # default filepath does not exist
-            pass
-        else:
-            print("Specified or Default input data not found.")
-            potential_files = os.listdir(os.path.join(dir, 'data'))    
-            csv_files = list(filter(lambda f: f.endswith('.csv'), potential_files))
+    if args.input_filename == None:
+        default_path = os.path.join(dir, 'data', 'antisemitism_discrimination_triplets.csv')
+        print("No explicitly specified input filepath. Using default input filepath: " + default_path)
+        args.input_filename = default_path
 
-            if len(csv_files) >= 0:
-                new_path = os.path.join(dir, 'data', csv_files[0])
-                print("Will instead run program on filepath: " + new_path)
-                args.input_filename = new_path
-            else:
-                print("Exiting Program")
-                exit() 
+    if os.path.exists(args.input_filename) == False: # specified or default filepath does not exist
+
+        print("Filepath not found.")
+        potential_files = os.listdir(os.path.join(dir, 'data'))    
+        csv_files = list(filter(lambda f: f.endswith('.csv'), potential_files))
+
+        print("Searching through data directory for valid input file...")
+        if len(csv_files) >= 0:
+
+            found_file = False
+            for input_filepath in csv_files:
+
+                new_path = os.path.join(dir, 'data', input_filepath)
+                
+                print("Run Program on this filepath: " + new_path + " ? (y/n)")
+                user_input = input()
+
+                if user_input[0] == 'Y' or user_input[0] == 'y':
+                    args.input_filename = new_path
+                    found_file = True
+                    break
+                else:
+                    continue
+
+            if found_file == False:
+                print("No more valid input files. Exiting Program")
+                exit()
+
+        else:
+            print("Exiting Program")
+            exit()
 
     return {
         "file_path" : args.input_filename,
@@ -200,8 +219,14 @@ def format_dataframe(df, path):
                 output = ''
                 output = output + ('<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["node_column_names"][0]) + ": " + "</b>" + row.subjects_coref + "</div>" +
                                '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["edge_column_name"]) + ": " + "</b>" + row.relations + "</div>" +  
-                               '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["node_column_names"][1]) + ": " + "</b>" + row.objects_coref + "</div>" +
-                               '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' +  "<b>" + str(args_dict['context_column_name']) + ": " + "</b>" + str(row.texts) + "</div>" + "<hr>")
+                               '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["node_column_names"][1]) + ": " + "</b>" + row.objects_coref + "</div>")
+                try:
+                    output = output + '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' +  "<b>" + str(args_dict['context_column_name']) + ": " + "</b>" + str(row.texts) + "</div>"
+                except:
+                    pass
+
+                output = output + "<hr>"
+
             output = output[:-4]
             return output
 
@@ -232,7 +257,7 @@ def format_dataframe(df, path):
         items = entity_list_to_convert
         
         # generate descriptions for each link; should look into implementing protocol for looking at duplicate instances
-        df_dedupe = df.drop_duplicates(subset=['subjects_coref', 'objects_coref'])
+        df_dedupe = df.drop_duplicates(subset=['subjects_coref', 'relations', 'objects_coref'])
         links = []
   
         for row in df_dedupe.itertuples():
@@ -240,36 +265,25 @@ def format_dataframe(df, path):
             if (pd.isna(row.subjects_coref) == True or pd.isna(row.objects_coref) == True):
                 continue
                 
-            try:
-                try:
-                    
-                    description_content = 'Speaker: ' + row.speakers + '; Relation: ' + row.relations + '; Context: ' + row.texts
-                    
-                    link_python = {
-                        "source_id" : int(all_entities[all_entities == row.subjects_coref].index[0]),
-                        "target_id" : int(all_entities[all_entities == row.objects_coref].index[0]),
-                        "strength" : 1 #len(df[(df['subjects_coref'] == row.subjects_coref) & (df['objects_coref'] == row.objects)]),
-                    }
-                    if args_dict['include_formatted_html'] >= 1: # bespoke formatting
-                        link_python["description"] = ('<div class="content-box">' + "<div class='description_heading'><a class='description_url' href='" + row.URL + "'> " + row.full_name + " </a></div>" + '<img src=' + row.image_link + ' width="200px" height="auto">'
-                                                + make_heading_html('Context: ') + make_text_html(row.texts, row.relations) + '</div>')
-                    else: # generic formatting
-                        link_python["description"] = (make_heading_html('Context: ') + '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + row.texts + '</div>')
+            try:               
+                link_python = {
+                    "source_id" : int(all_entities[all_entities == row.subjects_coref].index[0]),
+                    "target_id" : int(all_entities[all_entities == row.objects_coref].index[0]),
+                    "strength" : 1 #len(df[(df['subjects_coref'] == row.subjects_coref) & (df['objects_coref'] == row.objects)]),
+                }
+                if args_dict['include_formatted_html'] >= 1: # bespoke formatting
+                    link_python["description"] = ('<div class="content-box">' + "<div class='description_heading'><a class='description_url' href='" + row.URL + "'> " + row.full_name + " </a></div>" + '<img src=' + row.image_link + ' width="200px" height="auto">'
+                                            + make_heading_html('Context: ') + make_text_html(row.texts, row.relations) + '</div>')
+                else: # generic formatting
+                    output = ('<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["node_column_names"][0]) + ": " + "</b>" + row.subjects_coref + "</div>" +
+                           '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["edge_column_name"]) + ": " + "</b>" + row.relations + "</div>" +  
+                           '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["node_column_names"][1]) + ": " + "</b>" + row.objects_coref + "</div>")
+                    try: # attempt generic formatting with context
+                        output = output + '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' +  "<b>" + str(args_dict['context_column_name']) + ": " + "</b>" + str(row.texts) + "</div>"
+                    except AttributeError: # no  context found, omit context
+                        pass
+                    link_python["description"] = output
 
-                except AttributeError:
-                    
-                    description_base_html = "<div class='description_heading'> Triplet </div><div class='description_text'>" 
-                    description_content = row.relations
-                    
-                    link_python = {
-                        "source_id" : int(all_entities[all_entities == row.subjects_coref].index[0]),
-                        "target_id" : int(all_entities[all_entities == row.objects_coref].index[0]),
-                        "strength" : 1 #len(df[(df['subjects_coref'] == row.subjects_coref) & (df['objects'] == row.objects)]),
-                    }
-                    if args_dict['include_formatted_html'] >= 1:
-                        link_python["description"] = description_base_html + description_content + "</div>"
-
-                    
             except TypeError:
                 continue
 
@@ -312,7 +326,11 @@ if __name__ == "__main__":
     df_input['objects_coref'] = df_input[args_dict["node_column_names"][0]]
     df_input['subjects_coref'] = df_input[args_dict["node_column_names"][1]]
     df_input['relations'] = df_input[args_dict["edge_column_name"]]
-    df_input['texts'] = df_input[args_dict["context_column_name"]]
+
+    try:
+        df_input['texts'] = df_input[args_dict["context_column_name"]]
+    except KeyError:
+        print("Context metadata for triplets not found. Use Argument -c to specify context column within input data (if applicable)")
 
     if args_dict["include_formatted_html"] >= 1:
         if args_dict['verbosity'] >= 1:
@@ -321,13 +339,13 @@ if __name__ == "__main__":
             df_input = configure_metadata(df_input)
         except Exception as e:
             print(e)
-            print("Error fetching metadata for triplets specific to Discrimination Dataset")
+            print("Error fetching metadata for triplets specific to Discrimination Dataset \nBe sure that the input Datatset is formatted in a similar way to Discrimination Dataset, or do not use the -f argument")
             exit()
 
 
     if args_dict['verbosity'] >= 1:
         if args_dict["include_formatted_html"] >= 1:
-            print("Formatting HTML descriptions specifically for Discrimination Dataset...")
+            print("Formatting HTML descriptions specific to Discrimination Dataset...")
         else:
             print("Formatting HTML descriptions for general data")
 
@@ -336,9 +354,11 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         print("Error translating Dataset to VOSviewer JSON file")
+        exit()
 
     if args_dict['verbosity'] >= 1:
-        print("Finished Task. Output at: " + args_dict["output_path"])
+        out = os.path.basename(args_dict["output_path"])
+        print("Finished Task.")
 
 
 
