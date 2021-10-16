@@ -129,11 +129,11 @@ For our above social media example, relevant text based metadata is found as the
 
 So, we would type...
 
-'''
+```
 python vosviewer_triplet_translator.py user_1 action user_1 -i "/Users/Desktop/social_media_spreadsheet.csv.csv" -c full_post
-'''
+```
 
-Now, our Visualization will contain more metadata useful metadata. Hooray!
+Now, our Visualization will contain more useful metadata. Hooray!
 
 ### Troubleshooting
 
