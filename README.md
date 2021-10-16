@@ -4,7 +4,7 @@ This is a utility tool developed to translate .csv files into .json input for th
 
 VOSviewer is a software tool originally developed for constructing and analyzing bibliometric networks as network graphs. However, it is adaptable for many other uses. This utility tool serves as way to visualize spreadsheet data (.csv files) within VOSviewer.
 
-Many features of this tool were originally developed for specific use with a curated dataset of semantic triplets. These triplets were generated as a part of ongoing research in UCLA Prof Presner's Lab(https://holocaustresearchlab.com/). But this tool is appropriate for any dataset with the following general triplet structure:
+Many features of this tool were originally developed for specific use with a curated dataset of semantic triplets. These triplets were generated as a part of ongoing research in [UCLA Prof Presner's Lab](https://holocaustresearchlab.com/). But this tool is appropriate for any dataset with the following general triplet structure:
 
 Subject -> Verb -> Object
 
