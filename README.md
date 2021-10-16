@@ -1,10 +1,10 @@
 ## Welcome!
 
-This is a utility tool developed to designed to translate .csv files into .json input for the [VOSviewer Online Application](https://app.vosviewer.com/)
+This is a utility tool developed to translate .csv files into .json input for the [VOSviewer Online Application](https://app.vosviewer.com/)
 
 VOSviewer is a software tool originally developed for constructing and analyzing bibliometric networks as network graphs. However, it is adaptable for many other uses. This utility tool serves as way to visualize spreadsheet data (.csv files) within VOSviewer.
 
-Many features of this tool were originally developed for specific use with a curated dataset of semantic triplets. These triplets were generated and as a part of ongoing research in UCLA Prof Presner's Lab(). But this tool is appropriate for any dataset with the following general triplet structure:
+Many features of this tool were originally developed for specific use with a curated dataset of semantic triplets. These triplets were generated as a part of ongoing research in UCLA Prof Presner's Lab(https://holocaustresearchlab.com/). But this tool is appropriate for any dataset with the following general triplet structure:
 
 Subject -> Verb -> Object
 
@@ -18,7 +18,7 @@ User X -> Reposted -> Content from User Y.
 
 ### Dependencies
 
-Most modules this tool uses are in the standard Python 3 library. An exception is the popular Data Science tool Pandas. See [these tutorials](https://pandas.pydata.org/pandas-docs/stable/getting_started/install.html) for help with Pandas installation. An easy solution for those inexperienced with Python enviroments or command line tools is to install [Anaconda](https://anaconda.org/) 
+Most modules this tool uses are included in the standard Python 3 library. An exception is the popular Data Science tool Pandas. See [these tutorials](https://pandas.pydata.org/pandas-docs/stable/getting_started/install.html) for help with Pandas installation. An easy solution for those inexperienced with Python enviroments or command line tools is to install [Anaconda](https://anaconda.org/).
 
 ## Usage
 
@@ -71,16 +71,17 @@ python vosviewer_triplet_translator.py subjects relations objects
 
 This will utilize the triplet dataset included in the repository as input. This will then output the results in the 'output' directory.
 
-The 3 arguments NODE_COL_NAME_1 EDGE_COL_NAME NODE_COL_NAME_2 are required. These arguments specify which column names within the input .csv data are to be represented as 'sending' nodes, edges, and 'receiving' nodes respectively.
+The 3 arguments NODE_COL_NAME_1 EDGE_COL_NAME NODE_COL_NAME_2 are required. These arguments specify which column names within the input .csv file are to be represented as 'sending' nodes, edges, and 'receiving' nodes respectively.
 
 All other arguements are optional.
 
-A helpful arguement for use specifically with discrimination triplets (or other triplets with sufficient metadata) is the -f or --include_formatted_html argument.
+A helpful arguement for use specifically with the included triplets is the -f or --include_formatted_html argument:
 
 ```
 python vosviewer_triplet_translator.py subjects relations objects -f
 ```
-This will make the .json output contain much more specialized metadata for semantic triplets. However, this argument will throw an error if more general data is used as an argument.
+
+This will make the .json output contain specialized metadata for the included dataset. However, this argument will throw an error if more general data is used as an argument.
 
 #### A Note on Input and Output paths
 
@@ -100,12 +101,12 @@ As mentioned above, this program can be used with general triplet data.
 
 For demonstration, let's imagine we return to our example of using this tool for processing social media data.
 
-In our hypothetical social_media_spreadsheet.csv file located in our desktop, there are four relevant columns...
+In our hypothetical social_media_spreadsheet.csv file located on our desktop, there are four relevant columns...
 
-user_1 | action | user_1 | full_post 
------------- | ------------- | ---| ----|
-sally_s | likes | post_malone | "love the new album!"
-jose_m  | retweeted | david_64 | "nice pics!"
+user_1 |   action   |  user_1     | full_post 
+------ | ---------- | ------------| ---------------------|
+sally_s |   likes   | post_malone | "love the new album!"
+jose_m  | retweeted |  david_64   | "nice pants!"
 
 Within VOSviewer, we want to represent how some users interact with others through a network graph.
 
@@ -116,15 +117,15 @@ python vosviewer_triplet_translator.py user_1 action user_1 -i "/Users/Desktop/s
 ```
 Note that your specific input datapath would depend on your specific computer's OS, among other factors.
 
-Each of these 3 positional arguments corresponds with our input spreadsheet.
+Note that each of these 3 positional arguments above corresponds with our input spreadsheet.
 
 #### A note on the context arguement
 
-You will notice there is an optional argument -c or --context.
+You will notice there is an optional argument '-c' or '--context'.
 
 Users have the option to include basic string metadata to be represented in VOSviewer to supplement the graph vizualization.
 
-For our above social media example. Relevant text based metadata is found as the 'full_post' column. It would be useful to have this metadata represented in our visualization.
+For our above social media example, relevant text based metadata is found as the 'full_post' column. It would be useful to have this metadata represented in our visualization.
 
 So, we would type...
 
@@ -132,7 +133,7 @@ So, we would type...
 python vosviewer_triplet_translator.py user_1 action user_1 -i "/Users/Desktop/social_media_spreadsheet.csv.csv" -c full_post
 '''
 
-Now, our Visualization will contain more metadata - even for generalized data!
+Now, our Visualization will contain more metadata useful metadata. Hooray!
 
 ### Troubleshooting
 
@@ -141,6 +142,7 @@ Be sure that your three positional arguments correspond to your input .csv file.
 Remember, only use the -f optional argument when using the input data included in this repository.
 
 Additionally, feel free to reach out to me or to open an issue.
+
 
 Happy Visualizing!
 
