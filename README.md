@@ -20,10 +20,6 @@ User X -> Reposted -> Content from User Y.
 
 Most modules this tool uses are included in the standard Python 3 library. An exception is the popular Data Science tool Pandas. See [these tutorials](https://pandas.pydata.org/pandas-docs/stable/getting_started/install.html) for help with Pandas installation. An easy solution for those inexperienced with Python enviroments or command line tools is to install [Anaconda](https://anaconda.org/).
 
-### Video Tutorial / Demo
-
-For a step by step demo of this utility tool, feel free to watch [this video](https://youtu.be/_sq_ps-W42o)
-
 ## Usage
 
 This tool uses the command line interface. For using the tool, first navigate to this repository's directory. Then type
