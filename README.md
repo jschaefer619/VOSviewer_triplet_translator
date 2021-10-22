@@ -22,7 +22,7 @@ Most modules this tool uses are included in the standard Python 3 library. An ex
 
 ### Video Tutorial / Demo
 
-For a step by step demo of this utility tool, feel free to watch [this video](https://youtu.be/Uj5v4NnafJo)
+For a step by step demo of this utility tool, feel free to watch [this video](https://youtu.be/_sq_ps-W42o)
 
 ## Usage
 
