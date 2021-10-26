@@ -289,9 +289,15 @@ def format_dataframe(df, path):
 
             links.append(link_python)
 
+            def make_plural(input_str): # slightly naive way to handle plurals
+                if input_str[-1] == 's' or input_str[-1] == 'S':
+                    return input_str + 's'
+                else :
+                    return input_str
+
         data_struct = {'network': {'items': items, 'links': links}, 
-                       'config': {'terminology': {'item' : 'entity/object', 'items' : 'entities/objects', 
-                        'link' : 'relation', 'links' : 'relations'},
+                       'config': {'terminology': {'item' : args_dict["node_column_names"][0] + '/' + args_dict["node_column_names"][1], 'items' : make_plural(args_dict["node_column_names"][0]) + '/' + make_plural(args_dict["node_column_names"][1]), 
+                        'link' : args_dict["edge_column_name"], 'links' : make_plural(args_dict["edge_column_name"])},
                         'parameters' : {'item size' : 1}, 
                         'styles' : {'description_heading' : "label: description-heading;\n    color: #757575;\n    font-weight: 600;\n font-size: 1.5em;\n ",
                                    'description_label' : "label: description-label;\n  ",
