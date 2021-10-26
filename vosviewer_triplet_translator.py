@@ -176,7 +176,7 @@ def format_dataframe(df, path):
             
         def make_heading_html(text):
             return "<div class='description_heading'>" + text + "</div>"
-        def make_text_html(text, relation): # inline CSS (not great - should come up with fix at some point)
+        def make_formatted_text_html(text, relation):
             
             relation = relation.strip()
             context = text.split(relation)
@@ -196,11 +196,11 @@ def format_dataframe(df, path):
                             relation = manual_corrections[full_text]
                             context = text.split(relation)  
             try:
-                return '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + context[0] + "<b>" + relation + "</b>" + context[1] + "</div>"
+                return '<div class="basic_text" >' + context[0] + "<b>" + relation + "</b>" + context[1] + "</div>"
             except TypeError:
                 return ""
             except IndexError:
-                return '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + text + "</div>"
+                return '<div class="basic_text" >' + text + "</div>"
         def make_label_html(text):
             return "<div class='description_label'>" + text + "</div>"
         def make_link_html(text, link):
@@ -209,7 +209,7 @@ def format_dataframe(df, path):
             output = ''
             for row in df.itertuples():
                 output = output + ("<div class='description_heading'><a class='description_url' href='" + row.URL + "'> " + row.full_name + " </a></div>" + '<img src=' + row.image_link + ' width="200px" height="auto">' 
-                                + make_heading_html('Context: ') + make_text_html(row.texts, row.relations) + "<hr>")
+                                + make_heading_html('Context: ') + make_formatted_text_html(row.texts, row.relations) + "<hr>")
             output = output[:-4]
             return output
 
@@ -217,11 +217,11 @@ def format_dataframe(df, path):
 
             for row in df.itertuples():            
                 output = ''
-                output = output + ('<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["node_column_names"][0]) + ": " + "</b>" + row.subjects_coref + "</div>" +
-                               '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["edge_column_name"]) + ": " + "</b>" + row.relations + "</div>" +  
-                               '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["node_column_names"][1]) + ": " + "</b>" + row.objects_coref + "</div>")
+                output = output + ('<div class="basic_text" >' + "<b>" + str(args_dict["node_column_names"][0]) + ": " + "</b>" + row.subjects_coref + "</div>" +
+                               '<div class="basic_text" >' + "<b>" + str(args_dict["edge_column_name"]) + ": " + "</b>" + row.relations + "</div>" +  
+                               '<div class="basic_text" >' + "<b>" + str(args_dict["node_column_names"][1]) + ": " + "</b>" + row.objects_coref + "</div>")
                 try:
-                    output = output + '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' +  "<b>" + str(args_dict['context_column_name']) + ": " + "</b>" + str(row.texts) + "</div>"
+                    output = output + '<div class="basic_text" >' +  "<b>" + str(args_dict['context_column_name']) + ": " + "</b>" + str(row.texts) + "</div>"
                 except:
                     pass
 
@@ -273,13 +273,13 @@ def format_dataframe(df, path):
                 }
                 if args_dict['include_formatted_html'] >= 1: # bespoke formatting
                     link_python["description"] = ('<div class="content-box">' + "<div class='description_heading'><a class='description_url' href='" + row.URL + "'> " + row.full_name + " </a></div>" + '<img src=' + row.image_link + ' width="200px" height="auto">'
-                                            + make_heading_html('Context: ') + make_text_html(row.texts, row.relations) + '</div>')
+                                            + make_heading_html('Context: ') + make_formatted_text_html(row.texts, row.relations) + '</div>')
                 else: # generic formatting
-                    output = ('<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["node_column_names"][0]) + ": " + "</b>" + row.subjects_coref + "</div>" +
-                           '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["edge_column_name"]) + ": " + "</b>" + row.relations + "</div>" +  
-                           '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' + "<b>" + str(args_dict["node_column_names"][1]) + ": " + "</b>" + row.objects_coref + "</div>")
+                    output = ('<div class=basic_text >' + "<b>" + str(args_dict["node_column_names"][0]) + ": " + "</b>" + row.subjects_coref + "</div>" +
+                           '<div class="basic_text" >' + "<b>" + str(args_dict["edge_column_name"]) + ": " + "</b>" + row.relations + "</div>" +  
+                           '<div class="basic_text" >' + "<b>" + str(args_dict["node_column_names"][1]) + ": " + "</b>" + row.objects_coref + "</div>")
                     try: # attempt generic formatting with context
-                        output = output + '<div style= "margin-bottom: 4px;\n  font-size: 1.25em;\n" >' +  "<b>" + str(args_dict['context_column_name']) + ": " + "</b>" + str(row.texts) + "</div>"
+                        output = output + '<div class="basic_text" >' +  "<b>" + str(args_dict['context_column_name']) + ": " + "</b>" + str(row.texts) + "</div>"
                     except AttributeError: # no  context found, omit context
                         pass
                     link_python["description"] = output
@@ -288,20 +288,16 @@ def format_dataframe(df, path):
                 continue
 
             links.append(link_python)
-            
-        description_text = "\n    label: description-text;\n    margin-bottom: 4px;\n  color: #3a11e8;\n "
 
         data_struct = {'network': {'items': items, 'links': links}, 
                        'config': {'terminology': {'item' : 'entity/object', 'items' : 'entities/objects', 
                         'link' : 'relation', 'links' : 'relations'},
                         'parameters' : {'item size' : 1}, 
-                        'styles' : {'description_heading' : "\n    label: description-heading;\n    color: #757575;\n    font-weight: 600;\n font-size: 1.5em;\n ",
-                                   'description_label' : "\n    label: description-label;\n  ",
-                                   'description_text ': "\n    label: description-text;\n    margin-bottom: 4px;\n  font-size: 1.25em;\n",
-                                   'description_url' : '\n    label: description-url;\n    text-decoration: none;\n    color: #1e7896;\n  font-weight: 600;\n font-size: 1.25em;\n '},
-                        'templates' : {
-                            "item_description": "<div class='description_heading'> Entity / Object </div><div class='description_label'><a class='description_url' href='https://sfi.usc.edu/'>{label}</a></div>"
-                        }}
+                        'styles' : {'description_heading' : "label: description-heading;\n    color: #757575;\n    font-weight: 600;\n font-size: 1.5em;\n ",
+                                   'description_label' : "label: description-label;\n  ",
+                                   'description_text ': "label: description-text;\n    margin-bottom: 4px;\n  font-size: 1.25em;\n", # not in use, have been using basic text styling below instead
+                                   'basic_text' : "label: basic-text; margin-bottom: 4px;\n  font-size: 1.25em;\n",
+                                   'description_url' : '\n    label: description-url;\n    text-decoration: none;\n    color: #1e7896;\n  font-weight: 600;\n font-size: 1.25em;\n '},}
                       }
         output = json.JSONEncoder().encode(data_struct)
 
