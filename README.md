@@ -145,7 +145,7 @@ Be sure that your three positional arguments correspond to your input .csv file.
 
 Remember, only use the -f optional argument when using the input data included in this repository.
 
-For some people, using 'python3' instead of 'python' will resolve some issues with running the script. Users should be utilize whatever command runs the python enviroment with pandas and all the other necessary dependencies.
+Depending on the configeration of python on your local machine, using 'python3' instead of 'python' will resolve some issues with running the script. You should utilize whatever command runs the python enviroment with pandas and all the other necessary dependencies.
 
 Additionally, feel free to reach out to me or to open an issue.
 
