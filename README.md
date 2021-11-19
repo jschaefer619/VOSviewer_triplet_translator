@@ -110,7 +110,7 @@ In our hypothetical social_media_spreadsheet.csv file located on our desktop, th
 user_1 |   action   |  user_1     | full_post 
 ------ | ---------- | ------------| ---------------------|
 sally_s |   likes   | post_malone | "love the new album!"
-jose_m  | retweeted |  david_64   | "nice pants!"
+jose_m  | retweeted |  david_64   | "nice photo!"
 
 Within VOSviewer, we want to represent how some users interact with others through a network graph.
 
